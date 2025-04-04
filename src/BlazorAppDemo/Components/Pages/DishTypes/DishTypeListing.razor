@@ -1,0 +1,84 @@
+﻿@page "/DishTypes/dishTypeListing"
+@layout BlazorAppDemo.Components.Layout.DishTypeLayout
+@rendermode InteractiveServer
+
+<EditForm Model="DishTypeListModel">
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:5rem">
+                    <img type="button" src="\assets\TrashCan.png" class="w-25" @onclick="() => ToDelete()" />
+                </th>
+                <th style="width:30rem; padding-left:3rem">
+                    Názov (editovateľný)
+                </th>
+                <th style="padding-left:3rem">
+                    Poradie (alebo drag&drop názov)
+                        <button type="button" style="font-size: 0.7rem; color: black; background-color: white; border-color: lightgray;margin-left: 0.5rem;"
+                            @onclick="() => OnOrderChangeApprovalAsync()">Potvrď nové poradie</button>
+                    <span style="color:green; font-weight: normal; margin-left:1rem;">@OrderChangeNotification</span>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var dishType in DishTypeListModel)
+            {
+                var dishTypeId = dishType.Id;
+                <tr>
+                    <td style="vertical-align: middle">
+                        @if (dishTypeId != 0)
+                        {
+                            <InputCheckbox @bind-Value="@DishTypesToDelete[dishTypeId]" />
+                        }
+                    </td>
+                    <td style="vertical-align: middle; padding-left:3rem">
+                        @if (dishTypeId != 0)
+                        {
+                            <InputText style="width:30rem; outline:none" class="border-0" @bind-Value="@dishType.Name"
+                                       draggable="true" @ondragstart="() => HandleOnDragStart(dishTypeId)" @ondragover="() => HandleOnDragOver(dishTypeId)" />
+                        }
+                        else
+                        {
+                            <InputText style="width:30rem; outline:none" class="border-0" @bind-Value="@dishType.Name" draggable="false" />
+                        }
+                    </td>
+                    <td style="padding-left:3rem">
+                        @if (dishTypeId != 0)
+                        {
+                            @if (dishType.Order != FirstPositionInOrder)
+                            {
+                                <button type="button" style="font-size:0.7rem;" @onclick="() => DishTypePositionUp(dishTypeId)">&uarr;</button>
+                            }
+                            else
+                            {
+                                <p type="button" style="font-size:0.7rem;"></p>
+                            }
+                            <br />
+                            @if (dishType.Order != LastPositionInOrder)
+                            {
+                                <button type="button" style="font-size:0.7rem;" @onclick="() => DishTypePositionDown(dishTypeId)">&darr;</button>
+                            }
+                            else
+                            {
+                                <p type="button" style="font-size:0.7rem;"></p>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <label style="font-weight: bold; margin-left:2rem">
+        Noý názov:
+        <InputText id="newname" style="width:30rem; margin-left:0.5rem; outline:none;" class="border-0" @bind-Value="@NewDishTypeName"></InputText>
+            <button type="button" style="font-size: 0.7rem; color: black; background-color: white; border-color: lightgray;margin-left: 0.5rem;"
+                @onclick="() => OnNewDishTypeAsync()">Pridaj do zoznamu</button>
+        <span style="color:green; font-weight: normal; margin-left:1rem;">@NewDishTypeNameNotification</span>
+    </label>
+</div>
+</EditForm>
